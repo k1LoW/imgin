@@ -1,0 +1,9 @@
+RedirectMatch 403 /\.
+RedirectMatch 403 /composer\.
+RedirectMatch 403 /config\.php
+RedirectMatch 403 /README\.md
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ imgin.php [L]
+</IfModule>

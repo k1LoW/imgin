@@ -1,0 +1,9 @@
+{
+    "name": "k1low/imgin",
+    "require": {
+        "php": "~5.4",
+        "composer/installers": "*",
+        "imagine/imagine": "*",
+        "nategood/commando": "*"
+    }
+}
