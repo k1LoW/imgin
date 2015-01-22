@@ -28,7 +28,7 @@ if (php_sapi_name() == 'cli') {
     $imgin = new Commando\Command();
     $imgin->option()
           ->require()
-          ->describedAs('clear or clearall')
+          ->describedAs('Clear manipurated image')
           ->must(function($cmd) {
               return in_array($cmd, array('clear', 'clearall'));
           })
