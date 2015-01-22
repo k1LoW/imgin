@@ -32,14 +32,22 @@ if (php_sapi_name() == 'cli') {
           ->must(function($cmd) {
               return in_array($cmd, array('clear', 'clearall'));
           })
-          ->option();
+          ->option()
+          ->describedAs('Original image path')
+          ->must(function($originalImagePath) {
+              if (is_null($originalImagePath)) {
+                  return true;
+              }
+              if (!file_exists($originalImagePath)) {
+                  throw new \Exception(sprintf('%s not exists', $originalImagePath));
+              }
+              return true;
+          });
 
     // clear
     if ($imgin[0] === 'clear') {
         $originalImagePath = $imgin[1];
-        if (!file_exists($originalImagePath)) {
-            $imgin->error(new \Exception(sprintf('%s not exists', $originalImagePath)));
-        }
+
         if (preg_match('#^'. $rootPath . '(.+)#', $originalImagePath, $matches)) {
             $relativeImagePath = $matches[1];
             foreach(glob($rootPath . '/*', GLOB_ONLYDIR) as $dirname) {
