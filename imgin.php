@@ -3,7 +3,7 @@
  * imgin
  *
  * ## Support pattern
- * 
+ *
  * - /100x80/
  *
  */
@@ -30,7 +30,7 @@ if (php_sapi_name() == 'cli') {
           ->require()
           ->describedAs('Clear manipurated image')
           ->must(function($cmd) {
-              return in_array($cmd, array('clear', 'clearall'));
+              return in_array($cmd, array('clearcache'));
           })
           ->option()
           ->describedAs('Original image path')
@@ -42,12 +42,26 @@ if (php_sapi_name() == 'cli') {
                   throw new \Exception(sprintf('%s not exists', $originalImagePath));
               }
               return true;
-          });
+          })
+          ->option('a')
+          ->aka('all')
+          ->describedAs('When clear cache all, use this option')
+          ->boolean();
 
-    // clear
-    if ($imgin[0] === 'clear') {
+    // clearcache
+    if ($imgin[0] === 'clearcache') {
+
+        // --all
+        if ($imgin['all']) {
+            foreach(glob($rootPath . '/*', GLOB_ONLYDIR) as $dirname) {
+                if (preg_match('#(/\d+x\d+)$#', $dirname)) {
+                    cleardir($dirname);
+                }
+            }
+            return;
+        }
+
         $originalImagePath = $imgin[1];
-
         if (preg_match('#^'. $rootPath . '(.+)#', $originalImagePath, $matches)) {
             $relativeImagePath = $matches[1];
             foreach(glob($rootPath . '/*', GLOB_ONLYDIR) as $dirname) {
@@ -59,18 +73,9 @@ if (php_sapi_name() == 'cli') {
                 }
             }
         }
+        return;
     }
 
-    // clearall
-    if ($imgin[0] === 'clearall') {
-        foreach(glob($rootPath . '/*', GLOB_ONLYDIR) as $dirname) {
-            if (preg_match('#(/\d+x\d+)$#', $dirname)) {
-                cleardir($dirname);
-            }
-        }
-    }
-    
-    return;
 }
 
 /**
