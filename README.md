@@ -13,7 +13,19 @@ Do you want to remove the existing VCS (.git, .svn..) history? [Y,n]? Y
 
 ## Usage
 
-TODO
+### Original image access
+
+/img/foo/bar/large.jpg
+
+### Resized image access
+
+/img/100x120/foo/bar/large.jpg
+
+### Clear cache image
+
+```sh
+$ php app/webroot/img/imgin.php clearcache /path/to/app/webroot/img/foo/bar/large.jpg
+```
 
 ## Requirement
 
