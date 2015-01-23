@@ -54,7 +54,7 @@ if (php_sapi_name() == 'cli') {
         // --all
         if ($imgin['all']) {
             foreach(glob($rootPath . '/*', GLOB_ONLYDIR) as $dirname) {
-                if (preg_match('#(/\d+x\d+)$#', $dirname)) {
+                if (preg_match('#/(\d+x\d+)$#', $dirname)) {
                     cleardir($dirname);
                 }
             }
@@ -65,8 +65,8 @@ if (php_sapi_name() == 'cli') {
         if (preg_match('#^'. $rootPath . '(.+)#', $originalImagePath, $matches)) {
             $relativeImagePath = $matches[1];
             foreach(glob($rootPath . '/*', GLOB_ONLYDIR) as $dirname) {
-                if (preg_match('#(/\d+x\d+)$#', $dirname, $matches)) {
-                    $resizedImagePath = $rootPath . $matches[1] . $relativeImagePath;
+                if (preg_match('#/(\d+x\d+)$#', $dirname, $matches)) {
+                    $resizedImagePath = $rootPath . '/'. $matches[1] . $relativeImagePath;
                     if (file_exists($resizedImagePath)) {
                         unlink($resizedImagePath);
                     }
@@ -85,6 +85,18 @@ if (php_sapi_name() == 'cli') {
 $baseUrl = dirname($_SERVER['SCRIPT_NAME']);
 $dirname = basename(dirname($_SERVER['SCRIPT_NAME']));
 $imageUrl = preg_replace('#.+' . $dirname . '#', '', $_SERVER['REQUEST_URI']);
+
+// allow cache pattern
+$allow = false;
+foreach ($allowCachePattern as $pattern) {
+    if (preg_match('#^/' . $pattern . '/#', $imageUrl)) {
+        $allow = true;
+    }
+}
+if (!$allow) {
+    header('HTTP', true, 404);
+    exit;
+}
 
 if (preg_match('#^/(\d+)x(\d+)(/.+)$#', $imageUrl, $matches)) {
     $width = $matches[1];
