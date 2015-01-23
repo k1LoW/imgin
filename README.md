@@ -1,5 +1,16 @@
 # imgin: Image manipulation directory
 
+## Usage
+
+```sh
+$ composer -sdev create-project k1low/imgin app/webroot/img
+...
+
+Writing lock file
+Generating autoload files
+Do you want to remove the existing VCS (.git, .svn..) history? [Y,n]? Y
+```
+
 ## Requirement
 
 - PHP >=5.3
