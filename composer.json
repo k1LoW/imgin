@@ -1,8 +1,15 @@
 {
     "name": "k1low/imgin",
     "description": "Image manipulation directory",
-    "keywords": [
-        "image manipulation"
+    "keywords": ["image manipulation"],
+    "homepage": "https://github.com/k1LoW/imgin",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ken'ichiro Oyama",
+            "homepage": "https://github.com/k1LoW",
+            "role": "Author"
+        }
     ],
     "require": {
         "php": ">=5.3.2",
