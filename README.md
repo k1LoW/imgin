@@ -1,15 +1,19 @@
 # imgin: Image manipulation directory
 
-## Usage
+## Install
 
 ```sh
-$ composer -sdev create-project k1low/imgin app/webroot/img
+$ composer -sdev create-project k1low/imgin ./app/webroot/img
 ...
 
 Writing lock file
 Generating autoload files
 Do you want to remove the existing VCS (.git, .svn..) history? [Y,n]? Y
 ```
+
+## Usage
+
+TODO
 
 ## Requirement
 
