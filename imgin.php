@@ -17,6 +17,7 @@ if (!defined('DS')) {
 
 interface ImginSource
 {
+    public function getType();
     public function getPath($key);
 }
 
@@ -27,6 +28,10 @@ class ImginFileSource implements ImginSource
     public function __construct($rootPath)
     {
         $this->rootPath = $rootPath;
+    }
+    public function getType()
+    {
+        return 'File';
     }
     public function getPath($key)
     {
@@ -46,22 +51,30 @@ class ImginS3Source implements ImginSource
         $this->bucket = $bucket;
         $this->prefix = $prefix;
     }
+    public function getType()
+    {
+        return 'S3';
+    }
     public function getPath($key)
     {
-        $tmpPath = '/tmp'.DS.basename($key);
+        $tmpPath = '/tmp'.DS.'imgincache'.DS.$key;
         @unlink($tmpPath);
+        return $this->createObject($key, $tmpPath);
+    }
+    public function createObject($key, $path){
         try {
+            mkdir(dirname($path), 0777, true);
             $result = $this->client->getObject(array(
                 'Bucket' => $this->bucket,
                 'Key' => $this->prefix.$key,
-                'SaveAs' => $tmpPath,
+                'SaveAs' => $path,
             ));
 
-            return $tmpPath;
+            return $path;
         } catch (Exception $e) {
             erorr_log($e->getMessage(), 0);
 
-            return $tmpPath;
+            return $path;
         }
     }
 }
@@ -133,6 +146,10 @@ if (php_sapi_name() == 'cli') {
                 }
             }
         }
+        // S3: Clear original cache image
+        if ($source->getType() === 'S3') {
+            unlink($originalImagePath);
+        }
 
         return;
     }
@@ -147,6 +164,25 @@ $dirname = basename(dirname($_SERVER['SCRIPT_NAME']));
 $requestUri = $_SERVER['REQUEST_URI'];
 $imageUrl = preg_replace('#.+'.$dirname.'#', '', $requestUri);
 
+if (preg_match('#^'.DS.'(\d+)x(\d+)'.DS.'(.+)$#', $imageUrl, $matches)) {
+    $width = $matches[1];
+    $height = $matches[2];
+    $originalImageKey = $matches[3];
+} else {
+    // S3: Create original cache image
+    if ($source->getType() === 'S3') {
+        $originalImageKey = preg_replace('#^'.DS.'#', '', $imageUrl);
+        $cacheImagePath = $rootPath.$imageUrl;
+        $path = $source->createObject($originalImageKey, $cacheImagePath);
+        if (file_exists($path)) {
+            header('Location: '.$requestUri, true, 307);
+            exit;
+        }
+    }
+    header('HTTP', true, 404);
+    exit;
+}
+
 // allow manipurated image cache pattern
 $allow = false;
 foreach ($allowCachePattern as $pattern) {
@@ -155,15 +191,6 @@ foreach ($allowCachePattern as $pattern) {
     }
 }
 if (!$allow) {
-    header('HTTP', true, 404);
-    exit;
-}
-
-if (preg_match('#^'.DS.'(\d+)x(\d+)'.DS.'(.+)$#', $imageUrl, $matches)) {
-    $width = $matches[1];
-    $height = $matches[2];
-    $originalImageKey = $matches[3];
-} else {
     header('HTTP', true, 404);
     exit;
 }

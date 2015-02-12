@@ -17,7 +17,7 @@ Do you want to remove the existing VCS (.git, .svn..) history? [Y,n]? Y
 
 /img/foo/bar/large.jpg
 
-### Resized image access
+### Resized cache image access
 
 /img/100x120/foo/bar/large.jpg
 
@@ -27,17 +27,33 @@ Do you want to remove the existing VCS (.git, .svn..) history? [Y,n]? Y
 $ php app/webroot/img/imgin.php clearcache /path/to/app/webroot/img/foo/bar/large.jpg
 ```
 
+### Clear all cache image
+
+```sh
+$ php app/webroot/img/imgin.php clearcache --all
+```
+
 ## Usage (S3)
 
-### Original image access
+### Original image
 
-**TODO**
+https://s3-ap-northeast-1.amazonaws.com/s3-bucket-name/foo/bar/large.jpg
 
-### Resized image access
+### Original "cache" image access
+
+/img/foo/bar/large.jpg
+
+### Resized cache image access
 
 /img/100x120/foo/bar/large.jpg
 
 ### Clear cache image
+
+```sh
+$ php app/webroot/img/imgin.php clearcache /path/to/app/webroot/img/foo/bar/large.jpg
+```
+
+### Clear all cache image
 
 **TODO**
 

@@ -29,3 +29,9 @@ $client = S3Client::factory(array(
             'region' => Region::AP_NORTHEAST_1));
 $source = new ImginS3Source($client, 's3-bucket-name');
 */
+
+$client = Aws\S3\S3Client::factory(array(
+            'key' => 'AKIAJHFUO473BKOTZ6MA',
+            'secret' => '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',
+            'region' => Aws\Common\Enum\Region::AP_NORTHEAST_1));
+$source = new ImginS3Source($client, 'imgin-test');
