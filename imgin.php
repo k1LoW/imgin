@@ -24,10 +24,12 @@ interface ImginSource
 class ImginFileSource implements ImginSource
 {
     private $rootPath;
-    public function __construct($rootPath) {
+    public function __construct($rootPath)
+    {
         $this->rootPath = $rootPath;
     }
-    public function getPath($key){
+    public function getPath($key)
+    {
         return $this->rootPath.DS.$key;
     }
 }
@@ -38,23 +40,27 @@ class ImginS3Source implements ImginSource
     private $client;
     private $bucket;
     private $prefix;
-    public function __construct(Aws\S3\S3Client $client, $bucket, $prefix = '') {
+    public function __construct(Aws\S3\S3Client $client, $bucket, $prefix = '')
+    {
         $this->client = $client;
         $this->bucket = $bucket;
         $this->prefix = $prefix;
     }
-    public function getPath($key){
+    public function getPath($key)
+    {
         $tmpPath = '/tmp'.DS.basename($key);
         @unlink($tmpPath);
         try {
             $result = $this->client->getObject(array(
                 'Bucket' => $this->bucket,
-                'Key' => $this->prefix . $key,
+                'Key' => $this->prefix.$key,
                 'SaveAs' => $tmpPath,
             ));
+
             return $tmpPath;
         } catch (Exception $e) {
             erorr_log($e->getMessage(), 0);
+
             return $tmpPath;
         }
     }
