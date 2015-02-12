@@ -7,15 +7,20 @@
  * - /100x80/
  *
  */
-require dirname(__FILE__) . '/vendor/autoload.php';
-require dirname(__FILE__) . '/config.php';
+require dirname(__FILE__).'/vendor/autoload.php';
+require dirname(__FILE__).'/config.php';
 
 $rootPath = dirname(__FILE__);
 
-function cleardir($dir) {
+if (!defined('DS')) {
+    define('DS', DIRECTORY_SEPARATOR);
+}
+
+function cleardir($dir)
+{
     if (is_dir($dir) && !is_link($dir)) {
-        array_map('cleardir',   glob($dir.'/*', GLOB_ONLYDIR));
-        array_map('unlink', glob($dir.'/*'));
+        array_map('cleardir',   glob($dir.DS.'*', GLOB_ONLYDIR));
+        array_map('unlink', glob($dir.DS.'*'));
         rmdir($dir);
     }
 }
@@ -29,18 +34,19 @@ if (php_sapi_name() == 'cli') {
     $imgin->option()
           ->require()
           ->describedAs('Clear manipurated image')
-          ->must(function($cmd) {
+          ->must(function ($cmd) {
               return in_array($cmd, array('clearcache'));
           })
           ->option()
           ->describedAs('Original image path')
-          ->must(function($originalImagePath) {
+          ->must(function ($originalImagePath) {
               if (is_null($originalImagePath)) {
                   return true;
               }
               if (!file_exists($originalImagePath)) {
                   throw new \Exception(sprintf('%s not exists', $originalImagePath));
               }
+
               return true;
           })
           ->option('a')
@@ -53,29 +59,30 @@ if (php_sapi_name() == 'cli') {
 
         // --all
         if ($imgin['all']) {
-            foreach(glob($rootPath . '/*', GLOB_ONLYDIR) as $dirname) {
+            foreach (glob($rootPath.DS.'*', GLOB_ONLYDIR) as $dirname) {
                 if (preg_match('#/(\d+x\d+)$#', $dirname)) {
                     cleardir($dirname);
                 }
             }
+
             return;
         }
 
         $originalImagePath = $imgin[1];
-        if (preg_match('#^'. $rootPath . '(.+)#', $originalImagePath, $matches)) {
+        if (preg_match('#^'.$rootPath.'(.+)#', $originalImagePath, $matches)) {
             $relativeImagePath = $matches[1];
-            foreach(glob($rootPath . '/*', GLOB_ONLYDIR) as $dirname) {
+            foreach (glob($rootPath.DS.'*', GLOB_ONLYDIR) as $dirname) {
                 if (preg_match('#/(\d+x\d+)$#', $dirname, $matches)) {
-                    $resizedImagePath = $rootPath . '/'. $matches[1] . $relativeImagePath;
+                    $resizedImagePath = $rootPath.DS.$matches[1].$relativeImagePath;
                     if (file_exists($resizedImagePath)) {
                         unlink($resizedImagePath);
                     }
                 }
             }
         }
+
         return;
     }
-
 }
 
 /**
@@ -84,12 +91,13 @@ if (php_sapi_name() == 'cli') {
  */
 $baseUrl = dirname($_SERVER['SCRIPT_NAME']);
 $dirname = basename(dirname($_SERVER['SCRIPT_NAME']));
-$imageUrl = preg_replace('#.+' . $dirname . '#', '', $_SERVER['REQUEST_URI']);
+$requestUri = $_SERVER['REQUEST_URI'];
+$imageUrl = preg_replace('#.+'.$dirname.'#', '', $requestUri);
 
-// allow cache pattern
+// allow manipurated image cache pattern
 $allow = false;
 foreach ($allowCachePattern as $pattern) {
-    if (preg_match('#^/' . $pattern . '/#', $imageUrl)) {
+    if (preg_match('#^'.DS.$pattern.DS.'#', $imageUrl)) {
         $allow = true;
     }
 }
@@ -98,17 +106,17 @@ if (!$allow) {
     exit;
 }
 
-if (preg_match('#^/(\d+)x(\d+)(/.+)$#', $imageUrl, $matches)) {
+if (preg_match('#^'.DS.'(\d+)x(\d+)'.DS.'(.+)$#', $imageUrl, $matches)) {
     $width = $matches[1];
     $height = $matches[2];
-    $originalImageUrl = $matches[3];
+    $originalImageKey = $matches[3];
 } else {
     header('HTTP', true, 404);
     exit;
 }
 
-$originalImagePath = $rootPath . $originalImageUrl;
-$resizedImagePath = $rootPath . $imageUrl;
+$originalImagePath = $rootPath.DS.$originalImageKey;
+$resizedImagePath = $rootPath.$imageUrl;
 
 if (!file_exists($originalImagePath)) {
     header('HTTP', true, 404);
@@ -132,7 +140,7 @@ try {
     }
     $relative->apply($image)
              ->save($resizedImagePath);
-    header('Location: ' . $_SERVER['REQUEST_URI'], true, 307);
+    header('Location: '.$requestUri, true, 307);
 } catch (Exception $e) {
     header('HTTP', true, 500);
     echo $e->getMessage();
