@@ -11,7 +11,7 @@ Generating autoload files
 Do you want to remove the existing VCS (.git, .svn..) history? [Y,n]? Y
 ```
 
-## Usage
+## Usage (File)
 
 ### Original image access
 
@@ -27,6 +27,20 @@ Do you want to remove the existing VCS (.git, .svn..) history? [Y,n]? Y
 $ php app/webroot/img/imgin.php clearcache /path/to/app/webroot/img/foo/bar/large.jpg
 ```
 
+## Usage (S3)
+
+### Original image access
+
+**TODO**
+
+### Resized image access
+
+/img/100x120/foo/bar/large.jpg
+
+### Clear cache image
+
+**TODO**
+
 ## Requirement
 
 - PHP >=5.3
@@ -34,6 +48,7 @@ $ php app/webroot/img/imgin.php clearcache /path/to/app/webroot/img/foo/bar/larg
 - mod_rewrite
 - [Imagine](http://imagine.readthedocs.org/en/latest/)
 - [Commando](https://github.com/nategood/commando)
+- AWS SDK for PHP
 
 ## License
 

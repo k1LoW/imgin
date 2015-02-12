@@ -8,13 +8,60 @@
  *
  */
 require dirname(__FILE__).'/vendor/autoload.php';
-require dirname(__FILE__).'/config.php';
 
 $rootPath = dirname(__FILE__);
 
 if (!defined('DS')) {
     define('DS', DIRECTORY_SEPARATOR);
 }
+
+interface ImginSource
+{
+    public function getPath($key);
+}
+
+// File
+class ImginFileSource implements ImginSource
+{
+    private $rootPath;
+    public function __construct($rootPath) {
+        $this->rootPath = $rootPath;
+    }
+    public function getPath($key){
+        return $this->rootPath.DS.$key;
+    }
+}
+
+// S3
+class ImginS3Source implements ImginSource
+{
+    private $client;
+    private $bucket;
+    private $prefix;
+    public function __construct(Aws\S3\S3Client $client, $bucket, $prefix = '') {
+        $this->client = $client;
+        $this->bucket = $bucket;
+        $this->prefix = $prefix;
+    }
+    public function getPath($key){
+        $tmpPath = '/tmp'.DS.basename($key);
+        @unlink($tmpPath);
+        try {
+            $result = $this->client->getObject(array(
+                'Bucket' => $this->bucket,
+                'Key' => $this->prefix . $key,
+                'SaveAs' => $tmpPath,
+            ));
+            return $tmpPath;
+        } catch (Exception $e) {
+            erorr_log($e->getMessage(), 0);
+            return $tmpPath;
+        }
+    }
+}
+
+// Load config.php
+require dirname(__FILE__).'/config.php';
 
 function cleardir($dir)
 {
@@ -115,7 +162,7 @@ if (preg_match('#^'.DS.'(\d+)x(\d+)'.DS.'(.+)$#', $imageUrl, $matches)) {
     exit;
 }
 
-$originalImagePath = $rootPath.DS.$originalImageKey;
+$originalImagePath = $source->getPath($originalImageKey);
 $resizedImagePath = $rootPath.$imageUrl;
 
 if (!file_exists($originalImagePath)) {
@@ -128,7 +175,7 @@ try {
         umask(0);
         $result = mkdir(dirname($resizedImagePath), 0777, true);
         if (!$result) {
-            throw new OutOfBoundsException('Permission denied');
+            throw new OutOfBoundsException('Directory permission denied');
         }
     }
     $image = $imagine->open($originalImagePath);

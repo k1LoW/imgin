@@ -15,6 +15,7 @@
         "php": ">=5.3.2",
         "composer/installers": "*",
         "imagine/imagine": "*",
-        "nategood/commando": "*"
+        "nategood/commando": "*",
+        "aws/aws-sdk-php": "2.*"
     }
 }
