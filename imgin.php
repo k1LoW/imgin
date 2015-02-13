@@ -57,7 +57,7 @@ class ImginS3Source implements ImginSource
     }
     public function getPath($key)
     {
-        $tmpPath = '/tmp'.DS.'imgincache'.DS.$key;
+        $tmpPath = DS.'tmp'.DS.'imgincache'.DS.$key;
         @unlink($tmpPath);
         return $this->createObject($key, $tmpPath);
     }
@@ -92,14 +92,14 @@ function cleardir($dir)
 }
 
 /**
- * Clear manipurated image by CLI
+ * Clear manipulated image by CLI
  *
  */
 if (php_sapi_name() == 'cli') {
     $imgin = new Commando\Command();
     $imgin->option()
           ->require()
-          ->describedAs('Clear manipurated image')
+          ->describedAs('Clear manipulated image')
           ->must(function ($cmd) {
               return in_array($cmd, array('clearcache'));
           })
@@ -183,7 +183,7 @@ if (preg_match('#^'.DS.'(\d+)x(\d+)'.DS.'(.+)$#', $imageUrl, $matches)) {
     exit;
 }
 
-// allow manipurated image cache pattern
+// allow manipulated image cache pattern
 $allow = false;
 foreach ($allowCachePattern as $pattern) {
     if (preg_match('#^'.DS.$pattern.DS.'#', $imageUrl)) {
