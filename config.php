@@ -23,11 +23,10 @@ $source = new ImginFileSource($rootPath);
 
 /*
 // S3
-$client = S3Client::factory(array(
+$client = Aws\S3\S3Client::factory(array(
             'key' => 'Your Access Key',
             'secret' => 'Your Secret Key',
             'region' => Region::AP_NORTHEAST_1,
-            'credentials.cache' => true,
           ));
 $source = new ImginS3Source($client, 's3-bucket-name');
 */
