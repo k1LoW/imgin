@@ -63,7 +63,9 @@ class ImginS3Source implements ImginSource
     }
     public function createObject($key, $path){
         try {
-            mkdir(dirname($path), 0777, true);
+            if (!is_dir(dirname($path))) {
+                mkdir(dirname($path), 0777, true); 
+            }
             $result = $this->client->getObject(array(
                 'Bucket' => $this->bucket,
                 'Key' => $this->prefix.$key,
@@ -72,8 +74,9 @@ class ImginS3Source implements ImginSource
 
             return $path;
         } catch (Exception $e) {
-            erorr_log($e->getMessage(), 0);
-
+            unlink($path);
+            error_log($e->getMessage(), 0);
+            
             return $path;
         }
     }
