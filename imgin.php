@@ -166,6 +166,10 @@ $baseUrl = dirname($_SERVER['SCRIPT_NAME']);
 $dirname = basename(dirname($_SERVER['SCRIPT_NAME']));
 $requestUri = $_SERVER['REQUEST_URI'];
 $imageUrl = preg_replace('#.+'.$dirname.'#', '', $requestUri);
+if (is_dir($rootPath.$imageUrl)) {
+    header('HTTP', true, 403);
+    exit;
+}
 
 if (preg_match('#^'.DS.'(\d+)x(\d+)'.DS.'(.+)$#', $imageUrl, $matches)) {
     $width = $matches[1];
