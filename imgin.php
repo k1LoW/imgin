@@ -64,19 +64,27 @@ class ImginS3Source implements ImginSource
     public function createObject($key, $path){
         try {
             if (!is_dir(dirname($path))) {
-                mkdir(dirname($path), 0777, true); 
+                $dirmode = 0755;
+                if (defined('IMGIN_DIR_MODE')) {
+                    $dirmode = IMGIN_DIR_MODE;
+                }
+                mkdir(dirname($path), $dirmode, true);
             }
             $result = $this->client->getObject(array(
                 'Bucket' => $this->bucket,
                 'Key' => $this->prefix.$key,
                 'SaveAs' => $path,
             ));
-
+            $filemode = 0644;
+            if (defined('IMGIN_FILE_MODE')) {
+                $filemode = IMGIN_FILE_MODE;
+            }
+            chmod($path, $filemode);
             return $path;
         } catch (Exception $e) {
             unlink($path);
             error_log($e->getMessage(), 0);
-            
+
             return $path;
         }
     }
@@ -213,7 +221,11 @@ if (!file_exists($originalImagePath)) {
 try {
     if (!is_dir(dirname($resizedImagePath))) {
         umask(0);
-        $result = mkdir(dirname($resizedImagePath), 0777, true);
+        $dirmode = 0755;
+        if (defined('IMGIN_DIR_MODE')) {
+            $dirmode = IMGIN_DIR_MODE;
+        }
+        $result = mkdir(dirname($resizedImagePath), $dirmode, true);
         if (!$result) {
             throw new OutOfBoundsException('Directory permission denied');
         }
@@ -227,6 +239,13 @@ try {
     }
     $relative->apply($image)
              ->save($resizedImagePath);
+
+    $filemode = 0644;
+    if (defined('IMGIN_FILE_MODE')) {
+        $filemode = IMGIN_FILE_MODE;
+    }
+    chmod($resizedImagePath, $filemode);
+
     header('Location: '.$requestUri, true, 307);
 } catch (Exception $e) {
     header('HTTP', true, 500);

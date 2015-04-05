@@ -6,6 +6,12 @@
   $allowCachePattern
   $source
 */
+if (!defined('IMGIN_DIR_MODE')) {
+   define('IMGIN_DIR_MODE', 0755);
+}
+if (!defined('IMGIN_FILE_MODE')) {
+   define('IMGIN_FILE_MODE', 0644);
+}
 
 // ImagineInterface
 $imagine = new Imagine\Gd\Imagine();
