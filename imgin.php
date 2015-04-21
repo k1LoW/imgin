@@ -1,11 +1,11 @@
 <?php
+
 /**
  * imgin
  *
  * ## Support pattern
  *
  * - /100x80/
- *
  */
 require dirname(__FILE__).'/vendor/autoload.php';
 
@@ -68,7 +68,7 @@ class ImginS3Source implements ImginSource
                 if (defined('IMGIN_DIR_MODE')) {
                     $dirmode = IMGIN_DIR_MODE;
                 }
-                mkdir(dirname($path), $dirmode, true);
+                mkdirWithDirmode(dirname($path), $dirmode, true);
             }
             $result = $this->client->getObject(array(
                 'Bucket' => $this->bucket,
@@ -100,6 +100,20 @@ function cleardir($dir)
         array_map('unlink', glob($dir.DS.'*'));
         rmdir($dir);
     }
+}
+
+function mkdirWithDirmode($path)
+{
+    $dirmode = 0755;
+    if (defined('IMGIN_DIR_MODE')) {
+        $dirmode = IMGIN_DIR_MODE;
+    }
+    $mask = umask();
+    umask(000);
+    $result = mkdir($path, $dirmode, true);
+    umask($mask);
+
+    return $result;
 }
 
 /**
@@ -225,7 +239,7 @@ try {
         if (defined('IMGIN_DIR_MODE')) {
             $dirmode = IMGIN_DIR_MODE;
         }
-        $result = mkdir(dirname($resizedImagePath), $dirmode, true);
+        $result = mkdirWithDirmode(dirname($resizedImagePath), $dirmode, true);
         if (!$result) {
             throw new OutOfBoundsException('Directory permission denied');
         }
