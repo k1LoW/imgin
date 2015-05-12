@@ -187,7 +187,7 @@ if (php_sapi_name() == 'cli') {
 $baseUrl = dirname($_SERVER['SCRIPT_NAME']);
 $dirname = basename(dirname($_SERVER['SCRIPT_NAME']));
 $requestUri = urldecode($_SERVER['REQUEST_URI']);
-$imageUrl = preg_replace('#.+'.$dirname.'#', '', $requestUri);
+$imageUrl = preg_replace('#.+'.$dirname.'/#', '/', $requestUri);
 if (is_dir($rootPath.$imageUrl)) {
     header('HTTP', true, 403);
     exit;
