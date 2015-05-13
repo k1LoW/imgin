@@ -247,12 +247,22 @@ try {
     $image = $imagine->open($originalImagePath);
 
     if (($image->getSize()->getWidth() / $width) > ($image->getSize()->getHeight() / $height)) {
-        $relative = new Imagine\Filter\Advanced\RelativeResize('widen', $width);
+        if ($image->getSize()->getWidth() != $width) {
+            $relative = new Imagine\Filter\Advanced\RelativeResize('widen', $width);
+            $relative->apply($image)
+                     ->save($resizedImagePath);
+        } else {
+            copy($originalImagePath, $resizedImagePath);
+        }
     } else {
-        $relative = new Imagine\Filter\Advanced\RelativeResize('heighten', $height);
+        if ($image->getSize()->getHeight() != $height) {
+            $relative = new Imagine\Filter\Advanced\RelativeResize('heighten', $height);
+            $relative->apply($image)
+                     ->save($resizedImagePath);
+        } else {
+            copy($originalImagePath, $resizedImagePath);
+        }
     }
-    $relative->apply($image)
-             ->save($resizedImagePath);
 
     $filemode = 0644;
     if (defined('IMGIN_FILE_MODE')) {
