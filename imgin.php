@@ -11,6 +11,8 @@ require dirname(__FILE__).'/vendor/autoload.php';
 
 $rootPath = dirname(__FILE__);
 
+$dirRegex = '(\d+)x(\d+)(-[^/]+)?';
+
 if (!defined('DS')) {
     define('DS', DIRECTORY_SEPARATOR);
 }
@@ -151,7 +153,7 @@ if (php_sapi_name() == 'cli') {
         // --all
         if ($imgin['all']) {
             foreach (glob($rootPath.DS.'*', GLOB_ONLYDIR) as $dirname) {
-                if (preg_match('#/(\d+x\d+)$#', $dirname)) {
+                if (preg_match('#/' . $dirRegex . '$#', $dirname)) {
                     cleardir($dirname);
                 }
             }
@@ -163,8 +165,9 @@ if (php_sapi_name() == 'cli') {
         if (preg_match('#^'.$rootPath.'(.+)#', $originalImagePath, $matches)) {
             $relativeImagePath = $matches[1];
             foreach (glob($rootPath.DS.'*', GLOB_ONLYDIR) as $dirname) {
-                if (preg_match('#/(\d+x\d+)$#', $dirname, $matches)) {
-                    $resizedImagePath = $rootPath.DS.$matches[1].$relativeImagePath;
+                if (preg_match('#/'.$dirRegex.'$#', $dirname, $matches)) {
+                    array_shift($matches);
+                    $resizedImagePath = $rootPath.DS.implode('', $matches).$relativeImagePath;
                     if (file_exists($resizedImagePath)) {
                         unlink($resizedImagePath);
                     }
@@ -193,10 +196,11 @@ if (is_dir($rootPath.$imageUrl)) {
     exit;
 }
 
-if (preg_match('#^'.DS.'(\d+)x(\d+)'.DS.'(.+)$#', $imageUrl, $matches)) {
+if (preg_match('#^'.DS.$dirRegex.DS.'(.+)$#', $imageUrl, $matches)) {
     $width = $matches[1];
     $height = $matches[2];
-    $originalImageKey = $matches[3];
+    $suffix = $matches[3];
+    $originalImageKey = $matches[4];
 } else {
     // S3: Create original cache image
     if ($source->getType() === 'S3') {

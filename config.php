@@ -18,7 +18,7 @@ $imagine = new Imagine\Gd\Imagine();
 
 // allow manipurated image cache pattern
 $allowCachePattern = array(
-    '\d+x\d+', // full open
+    $dirRegex, // full open
     // '100x200',
     // '140x100',
 );
