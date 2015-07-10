@@ -60,10 +60,12 @@ class ImginS3Source implements ImginSource
     public function getPath($key)
     {
         $tmpPath = DS.'tmp'.DS.'imgincache'.DS.$key;
-        @unlink($tmpPath);
+        cleardir(dirname($tmpPath));
+
         return $this->createObject($key, $tmpPath);
     }
-    public function createObject($key, $path){
+    public function createObject($key, $path)
+    {
         try {
             if (!is_dir(dirname($path))) {
                 $dirmode = 0755;
@@ -82,6 +84,7 @@ class ImginS3Source implements ImginSource
                 $filemode = IMGIN_FILE_MODE;
             }
             chmod($path, $filemode);
+
             return $path;
         } catch (Exception $e) {
             unlink($path);
