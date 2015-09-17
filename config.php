@@ -12,7 +12,7 @@ if (!defined('IMGIN_DIR_MODE')) {
 if (!defined('IMGIN_FILE_MODE')) {
    define('IMGIN_FILE_MODE', 0644);
 }
-if (defined('IMGIN_CACHE_DIR')) {
+if (!defined('IMGIN_CACHE_DIR')) {
    define('IMGIN_CACHE_DIR', '/tmp/imgincache');
 }
 
