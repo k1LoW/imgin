@@ -60,6 +60,9 @@ class ImginS3Source implements ImginSource
     public function getPath($key)
     {
         $tmpPath = DS.'tmp'.DS.'imgincache'.DS.$key;
+        if (defined('IMGIN_CACHE_DIR')) {
+            $tmpPath = IMGIN_CACHE_DIR.DS.$key;
+        }
         cleardir(dirname($tmpPath));
 
         return $this->createObject($key, $tmpPath);
